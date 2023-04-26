@@ -1,0 +1,107 @@
+%{
+    #include <string.h>
+    
+    int line_counter = 1;
+
+    char* num_lexeme(char* str) {
+        int offset = str[0] == '-';
+        int start = offset;
+        int end = strlen(str) - 1;
+        
+        while (str[start] == '0' && start < end && str[start+1] != '.')
+             start++;
+        
+        if(strchr(str, '.'))
+            while (end > 0 && str[end] == '0' && str[end-1] != '.')
+                end--;
+        
+        int new_length = end - start + 1 + offset;
+        char* new_str = malloc(new_length + 1);  // +1 for the null terminator
+        
+        if (offset)
+            new_str[0] = '-';
+        
+        int i, j;
+        for (i = start, j = 0; i <= end; i++, j++) {
+            new_str[j + offset] = str[i];
+        }
+        new_str[j+offset] = '\0';
+        return new_str;
+    }
+
+    int count_newline(char* str) {
+        int count = 0;
+        int i;
+        for (i = 0; str[i] != '\0'; i++)
+            if (str[i] == '\n')
+                count++;
+        return count;
+    }
+
+%}
+
+tGET        "\"Get\""
+tSET        "\"Set\""
+tFUNCTION   "\"Function\""
+tPRINT      "\"Print\""
+tFOR        "\"For\""
+tIF         "\"If\""
+tRETURN     "\"Return\""
+tCOMMA      ","
+tEQUALITY   "\"==\""
+tPLUS       "\"+\""
+tMINUS      "\"-\""
+tMUL        "\"*\""
+tDIV        "\"/\""
+tINC        "\"++\""
+tDEC        "\"--\""
+tLBRAC      "["
+tRBRAC      "]"
+tGT         "\">\""
+tLT         "\"<\""
+tGEQ        "\">=\""
+tLEQ        "\"<=\""
+
+tIDENT      \"[a-zA-Z_]+[a-zA-Z0-9_]*\"
+tNUM        -?[0-9]+(\.[0-9]+)?
+tSTRING     '[^']*'
+
+whitespace [ \t]+
+illegal .
+%%
+
+\n line_counter++;
+{tGET}          printf("%d %s\n", line_counter, "tGET");
+{tSET}          printf("%d %s\n", line_counter, "tSET");
+{tFUNCTION}     printf("%d %s\n", line_counter, "tFUNCTION");
+{tPRINT}        printf("%d %s\n", line_counter, "tPRINT");
+{tFOR}          printf("%d %s\n", line_counter, "tFOR");
+{tIF}           printf("%d %s\n", line_counter, "tIF");
+{tRETURN}       printf("%d %s\n", line_counter, "tRETURN");
+{tCOMMA}        printf("%d %s\n", line_counter, "tCOMMA");
+{tEQUALITY}     printf("%d %s\n", line_counter, "tEQUALITY");
+{tPLUS}         printf("%d %s\n", line_counter, "tPLUS");
+{tMINUS}        printf("%d %s\n", line_counter, "tMINUS");
+{tMUL}          printf("%d %s\n", line_counter, "tMUL");
+{tDIV}          printf("%d %s\n", line_counter, "tDIV");
+{tINC}          printf("%d %s\n", line_counter, "tINC");
+{tDEC}          printf("%d %s\n", line_counter, "tDEC");
+{tLBRAC}        printf("%d %s\n", line_counter, "tLBRAC");
+{tRBRAC}        printf("%d %s\n", line_counter, "tRBRAC");
+{tGT}           printf("%d %s\n", line_counter, "tGT");
+{tLT}           printf("%d %s\n", line_counter, "tLT");
+{tGEQ}          printf("%d %s\n", line_counter, "tGEQ");
+{tLEQ}          printf("%d %s\n", line_counter, "tLEQ");
+
+{tIDENT}        printf("%d %s (%s)\n", line_counter, "tIDENT", strtok(yytext, "\""));
+{tNUM}          printf("%d %s (%s) (%s)\n", line_counter, "tNUM", yytext, num_lexeme(yytext));
+{tSTRING}       printf("%d %s (%s)\n", line_counter, "tSTRING", strtok(yytext, "'")); line_counter+=count_newline(yytext);
+
+{whitespace}
+{illegal}       printf("%d ILLEGAL CHARACTER (%s)\n", line_counter, yytext);
+
+%%
+
+int main() {
+    yylex();
+}

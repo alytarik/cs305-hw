@@ -1,0 +1,6 @@
+5 tSTRING (ali
+
+
+-2
+)
+10 tNUM (2) (2)

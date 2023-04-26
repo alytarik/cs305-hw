@@ -1,0 +1,56 @@
+%{
+#include "hw3.h"
+#include "alitarik-hw3.tab.h"
+%}
+%%
+
+
+["]Get["]		return tGET;
+["]Set["]		return tSET;
+["]Function["]		return tFUNCTION;
+["]Print["]		return tPRINT;
+["]If["]		return tIF;
+["]Return["]		return tRETURN;
+
+["]"+"["]               return tADD;
+["]"-"["]               return tSUB;
+["]"*"["]               return tMUL;
+["]"/"["]               return tDIV;
+["]"++"["]		return tINC;
+["]">"["]		return tGT;
+["]"=="["]		return tEQUALITY;
+["]"--"["]		return tDEC;
+["]"<"["]		return tLT;
+["]"<="["]		return tLEQ;
+["]">="["]		return tGEQ;
+
+
+["][_a-zA-Z][a-zA-Z0-9_]*["]	return tIDENT;
+				
+['][^']*['] {
+    char *result = (char *)malloc(strlen(yytext));
+    strcpy(result,yytext);
+    result++;
+    *(result+strlen(result)-1) = '\0';
+    yylval.strNode.val = result;
+    return tSTRING;
+};
+
+
+[0-9]+ |
+-[0-9]+ {
+    yylval.intNode.val = atoi(yytext);
+    return tNUM;
+};
+
+
+[0-9]+"."[0-9]+	|
+-[0-9]+"."[0-9]+ {
+    yylval.realNode.val = atof(yytext);
+    return tREAL;
+};
+	
+[ \t\n\r]+ 
+.			return yytext[0];
+
+%%
