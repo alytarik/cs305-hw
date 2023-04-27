@@ -1,6 +1,16 @@
 %{
 #include "hw3.h"
 #include "alitarik-hw3.tab.h"
+
+int line_counter = 1;
+int count_newline(char* str) {
+    int count = 0;
+    int i;
+    for (i = 0; str[i] != '\0'; i++)
+        if (str[i] == '\n')
+            count++;
+    return count;
+}
 %}
 %%
 
@@ -12,17 +22,17 @@
 ["]If["]		return tIF;
 ["]Return["]		return tRETURN;
 
-["]"+"["]               return tADD;
-["]"-"["]               return tSUB;
-["]"*"["]               return tMUL;
-["]"/"["]               return tDIV;
-["]"++"["]		return tINC;
-["]">"["]		return tGT;
-["]"=="["]		return tEQUALITY;
-["]"--"["]		return tDEC;
-["]"<"["]		return tLT;
-["]"<="["]		return tLEQ;
-["]">="["]		return tGEQ;
+["]"+"["]       {yylval.linenum = line_counter; return tADD;}
+["]"-"["]       {yylval.linenum = line_counter; return tSUB;}
+["]"*"["]       {yylval.linenum = line_counter; return tMUL;}
+["]"/"["]       {yylval.linenum = line_counter; return tDIV;}
+["]"++"["]		{yylval.linenum = line_counter; return tINC;}
+["]">"["]		{yylval.linenum = line_counter; return tGT;}
+["]"=="["]		{yylval.linenum = line_counter; return tEQUALITY;}
+["]"--"["]		{yylval.linenum = line_counter; return tDEC;}
+["]"<"["]		{yylval.linenum = line_counter; return tLT;}
+["]"<="["]		{yylval.linenum = line_counter; return tLEQ;}
+["]">="["]		{yylval.linenum = line_counter; return tGEQ;}
 
 
 ["][_a-zA-Z][a-zA-Z0-9_]*["]	return tIDENT;
@@ -32,25 +42,26 @@
     strcpy(result,yytext);
     result++;
     *(result+strlen(result)-1) = '\0';
-    yylval.strNode.val = result;
+    yylval.val.s = result;
+    line_counter+=count_newline(yytext);
     return tSTRING;
 };
 
 
 [0-9]+ |
 -[0-9]+ {
-    yylval.intNode.val = atoi(yytext);
+    yylval.val.i = atoi(yytext);
     return tNUM;
 };
 
 
 [0-9]+"."[0-9]+	|
 -[0-9]+"."[0-9]+ {
-    yylval.realNode.val = atof(yytext);
+    yylval.val.r = atof(yytext);
     return tREAL;
 };
-	
-[ \t\n\r]+ 
+\n line_counter++;
+[ \t\r]+ 
 .			return yytext[0];
 
 %%

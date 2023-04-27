@@ -71,18 +71,39 @@
 
 #include "hw3.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 void yyerror (const char *s){
     s = "ERROR";
     printf ("%s\n", s);
 }
+int yylex();
 
-ExprNode * expFromInt(IntNode);
-ExprNode * expFromReal(RealNode);
-ExprNode * expFromStr(StrNode);
-ExprNode * sumExp(ExprNode*, ExprNode*);
+ExprNode * expFromInt(Value);
+ExprNode * expFromReal(Value);
+ExprNode * expFromStr(Value);
+ExprNode * defaultExp();
+ExprNode * sumExp(int, ExprNode*, ExprNode*);
+ExprNode * subExp(int, ExprNode*, ExprNode*);
+ExprNode * multExp(int, ExprNode*, ExprNode*);
+ExprNode * divExp(int, ExprNode*, ExprNode*);
 
-#line 86 "alitarik-hw3.tab.c"
+ExprNode ** expressions;
+int expressionsSize = 1024;
+int exprIndex = 0;
+
+ExprNode* addExpressionToList(ExprNode * newExpr){
+    if(exprIndex < expressionsSize)
+        expressions[exprIndex++] = newExpr;
+    else{
+        expressionsSize = expressionsSize + expressionsSize;
+        expressions = realloc(expressions, expressionsSize);
+        expressions[exprIndex++] = newExpr;
+    }
+}
+
+
+#line 107 "alitarik-hw3.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -473,18 +494,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  12
+#define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   143
+#define YYLAST   137
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  27
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  11
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  39
+#define YYNRULES  38
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  127
+#define YYNSTATES  126
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   278
@@ -535,10 +556,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    34,    34,    36,    37,    38,    41,    42,    43,    44,
-      45,    46,    47,    48,    51,    52,    53,    54,    55,    58,
-      61,    64,    67,    68,    69,    70,    73,    74,    75,    76,
-      79,    80,    81,    82,    85,    86,    87,    88,    91,    92
+       0,    51,    51,    53,    54,    57,    58,    59,    60,    61,
+      62,    63,    64,    67,    68,    69,    70,    71,    74,    77,
+      80,    83,    84,    85,    86,    87,    88,    89,    90,    93,
+      94,    95,    96,    99,   100,   101,   102,   105,   106
 };
 #endif
 
@@ -569,7 +590,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-61)
+#define YYPACT_NINF (-74)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -583,19 +604,19 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -16,    57,    11,   -61,   -61,   -61,    15,    52,   -61,   -61,
-     -61,   -61,   -61,   -10,     9,    14,    22,    25,   -24,    31,
-      35,    40,    43,    63,    64,    65,    66,    67,    68,    69,
-     -61,   -61,    76,    77,    74,    61,    75,   -61,    61,    61,
-      61,    61,    61,    80,    61,    61,    81,    61,    61,    61,
-      34,    78,    82,    79,    53,    83,    24,    84,    86,    87,
-      88,    89,    90,    92,    93,    94,    96,    97,    98,    99,
-     -61,    85,    61,   100,   102,   -16,   -61,   -16,   -61,    61,
-      61,    61,    61,   -61,    61,    61,   -61,    61,    61,    61,
-      61,   103,   104,    82,   -61,   105,    62,   106,   107,   108,
-     109,   110,   111,   112,   113,   114,   115,   117,   -61,   -61,
-     -61,   -61,   -61,   118,   -61,   -61,   -61,   -61,   -61,   -61,
-     -61,   -61,   -61,    61,   -61,   -61,   -61
+     -22,   -74,    21,    42,   -74,   -74,   -74,   -74,     1,   -74,
+     -74,   -74,   -74,   -74,    -1,    13,    16,    30,    33,     4,
+      47,    53,    56,    60,    61,    62,    63,    64,    65,    66,
+      67,    27,    31,    50,    48,    70,   -74,    48,    48,    48,
+      48,    48,    75,    48,    48,    76,    48,    48,    48,     7,
+      71,    78,    73,    43,    77,     9,    74,    79,    80,    81,
+      82,    83,    85,    86,    87,    89,    90,    91,    92,   -74,
+      95,    48,    94,    96,   -22,   -74,   -22,   -74,    48,    48,
+      48,    48,   -74,    48,    48,   -74,    48,    48,    48,    48,
+      97,    98,    78,   -74,    99,    25,   100,   101,   102,   103,
+     104,   105,   106,   107,   108,   109,   111,   -74,   -74,   -74,
+     -74,   -74,   112,   -74,   -74,   -74,   -74,   -74,   -74,   -74,
+     -74,   -74,    48,   -74,   -74,   -74
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -603,33 +624,33 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     3,     0,    19,    20,    21,     0,     0,     4,    29,
-      13,    12,     1,     0,     0,     0,     0,     0,     0,     0,
+       0,     3,     0,     0,     1,    18,    19,    20,     0,     2,
+       4,    28,    12,    11,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       2,     5,     0,     0,     0,     0,     0,    38,     0,     0,
+       0,     0,     0,     0,     0,     0,    37,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    31,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-      22,     0,     0,    32,     0,     0,     9,     0,    39,     0,
-       0,     0,     0,    10,     0,     0,    11,     0,     0,     0,
-      35,     0,     0,    31,    30,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    36,     0,    23,     6,
-      33,    24,     7,     0,    25,    26,    27,    28,    17,    18,
-      16,    15,    14,    35,    34,     8,    37
+       0,    30,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    21,
+       0,     0,    31,     0,     0,     8,     0,    38,     0,     0,
+       0,     0,     9,     0,     0,    10,     0,     0,     0,    34,
+       0,     0,    30,    29,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    35,     0,    22,     5,    32,
+      23,     6,     0,    24,    25,    26,    27,    16,    17,    15,
+      14,    13,    34,    33,     7,    36
 };
 
 /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int16 yypgoto[] =
+static const yytype_int8 yypgoto[] =
 {
-     -61,   -60,   -61,   133,    70,   -35,   -61,    10,   -61,   -11,
-     -61
+     -74,   -73,   -74,   -74,    68,    -3,   -74,    19,   -74,   -21,
+     -74
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     7,     8,     9,    10,    53,    74,    91,   107,
-      11
+       0,     2,     3,    10,    11,   105,    52,    73,    90,   106,
+      13
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -637,77 +658,75 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      55,    37,    38,    58,    59,    60,    61,    62,     1,    64,
-      65,    12,    67,    68,    69,    95,    32,    96,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    33,   113,    92,    24,    25,
-      34,    27,    28,    29,    97,    98,    99,   100,    35,   101,
-     102,    36,   103,   104,   105,   106,    13,    39,    15,    70,
-      71,    40,    19,    20,    21,    22,    41,    24,    25,    42,
-      27,    28,    29,     3,     4,     5,     6,    30,     3,     4,
-       5,     6,     3,     4,     5,    54,     1,   112,   106,    43,
-      44,    45,    46,    47,    48,    49,    50,    51,    52,    56,
-      63,    66,    73,   110,    72,    75,    57,     0,    76,    90,
-      77,    78,   126,    79,    80,    81,    82,    83,     0,    84,
-      85,    86,     0,    87,    88,    89,    93,    94,   108,   109,
-     111,   114,   115,   116,   117,   118,   119,   120,   121,   122,
-      31,   123,   124,   125
+      12,    94,     1,    95,    14,    15,    16,    17,    18,    19,
+      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
+      30,     4,   112,    25,    26,    31,    28,    29,    30,    36,
+      37,    54,    69,    70,    57,    58,    59,    60,    61,    32,
+      63,    64,    33,    66,    67,    68,    14,    49,    16,     1,
+     111,    50,    20,    21,    22,    23,    34,    25,    26,    35,
+      28,    29,    30,     5,     6,     7,     8,     9,    91,     5,
+       6,     7,    53,    38,    51,    96,    97,    98,    99,    39,
+     100,   101,    40,   102,   103,   104,    41,    42,    43,    44,
+      45,    46,    47,    48,    55,    62,    65,    71,    72,    74,
+      76,   125,    75,    56,    77,     0,    78,    79,    80,    81,
+      82,   109,    83,    84,    85,     0,    86,    87,    88,    89,
+      92,    93,   107,   108,   110,   113,   114,   115,   116,   117,
+     118,   119,   120,   121,     0,   122,   123,   124
 };
 
 static const yytype_int8 yycheck[] =
 {
-      35,    25,    26,    38,    39,    40,    41,    42,    24,    44,
-      45,     0,    47,    48,    49,    75,    26,    77,     3,     4,
-       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    26,    96,    72,    14,    15,
-      26,    17,    18,    19,    79,    80,    81,    82,    26,    84,
-      85,    26,    87,    88,    89,    90,     3,    26,     5,    25,
-      26,    26,     9,    10,    11,    12,    26,    14,    15,    26,
-      17,    18,    19,    21,    22,    23,    24,    25,    21,    22,
-      23,    24,    21,    22,    23,    24,    24,    25,   123,    26,
-      26,    26,    26,    26,    26,    26,    20,    20,    24,    24,
-      20,    20,    20,    93,    26,    26,    36,    -1,    25,    24,
-      26,    25,   123,    26,    26,    26,    26,    25,    -1,    26,
-      26,    25,    -1,    26,    26,    26,    26,    25,    25,    25,
-      25,    25,    25,    25,    25,    25,    25,    25,    25,    25,
-       7,    26,    25,    25
+       3,    74,    24,    76,     3,     4,     5,     6,     7,     8,
+       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,     0,    95,    14,    15,    26,    17,    18,    19,    25,
+      26,    34,    25,    26,    37,    38,    39,    40,    41,    26,
+      43,    44,    26,    46,    47,    48,     3,    20,     5,    24,
+      25,    20,     9,    10,    11,    12,    26,    14,    15,    26,
+      17,    18,    19,    21,    22,    23,    24,    25,    71,    21,
+      22,    23,    24,    26,    24,    78,    79,    80,    81,    26,
+      83,    84,    26,    86,    87,    88,    26,    26,    26,    26,
+      26,    26,    26,    26,    24,    20,    20,    26,    20,    26,
+      26,   122,    25,    35,    25,    -1,    26,    26,    26,    26,
+      25,    92,    26,    26,    25,    -1,    26,    26,    26,    24,
+      26,    25,    25,    25,    25,    25,    25,    25,    25,    25,
+      25,    25,    25,    25,    -1,    26,    25,    25
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    24,    28,    21,    22,    23,    24,    29,    30,    31,
-      32,    37,     0,     3,     4,     5,     6,     7,     8,     9,
-      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
-      25,    30,    26,    26,    26,    26,    26,    25,    26,    26,
-      26,    26,    26,    26,    26,    26,    26,    26,    26,    26,
-      20,    20,    24,    33,    24,    32,    24,    31,    32,    32,
-      32,    32,    32,    20,    32,    32,    20,    32,    32,    32,
-      25,    26,    26,    20,    34,    26,    25,    26,    25,    26,
-      26,    26,    26,    25,    26,    26,    25,    26,    26,    26,
-      24,    35,    32,    26,    25,    28,    28,    32,    32,    32,
-      32,    32,    32,    32,    32,    32,    32,    36,    25,    25,
-      34,    25,    25,    28,    25,    25,    25,    25,    25,    25,
-      25,    25,    25,    26,    25,    25,    36
+       0,    24,    28,    29,     0,    21,    22,    23,    24,    25,
+      30,    31,    32,    37,     3,     4,     5,     6,     7,     8,
+       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    26,    26,    26,    26,    26,    25,    26,    26,    26,
+      26,    26,    26,    26,    26,    26,    26,    26,    26,    20,
+      20,    24,    33,    24,    32,    24,    31,    32,    32,    32,
+      32,    32,    20,    32,    32,    20,    32,    32,    32,    25,
+      26,    26,    20,    34,    26,    25,    26,    25,    26,    26,
+      26,    26,    25,    26,    26,    25,    26,    26,    26,    24,
+      35,    32,    26,    25,    28,    28,    32,    32,    32,    32,
+      32,    32,    32,    32,    32,    32,    36,    25,    25,    34,
+      25,    25,    28,    25,    25,    25,    25,    25,    25,    25,
+      25,    25,    26,    25,    25,    36
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    27,    28,    29,    29,    29,    30,    30,    30,    30,
-      30,    30,    30,    30,    31,    31,    31,    31,    31,    32,
-      32,    32,    32,    32,    32,    32,    32,    32,    32,    32,
-      33,    34,    34,    34,    35,    36,    36,    36,    37,    37
+       0,    27,    28,    29,    29,    30,    30,    30,    30,    30,
+      30,    30,    30,    31,    31,    31,    31,    31,    32,    32,
+      32,    32,    32,    32,    32,    32,    32,    32,    32,    33,
+      34,    34,    34,    35,    36,    36,    36,    37,    37
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     3,     0,     1,     2,     7,     7,     8,     5,
-       5,     5,     1,     1,     7,     7,     7,     7,     7,     1,
-       1,     1,     5,     7,     7,     7,     7,     7,     7,     1,
-       3,     0,     1,     3,     3,     0,     1,     3,     3,     5
+       0,     2,     3,     0,     2,     7,     7,     8,     5,     5,
+       5,     1,     1,     7,     7,     7,     7,     7,     1,     1,
+       1,     5,     7,     7,     7,     7,     7,     7,     1,     3,
+       0,     1,     3,     3,     0,     1,     3,     3,     5
 };
 
 
@@ -1170,40 +1189,80 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 19: /* expr: tNUM  */
-#line 58 "alitarik-hw3.y"
+  case 18: /* expr: tNUM  */
+#line 74 "alitarik-hw3.y"
            {
-        (yyval.exprNodePtr) = expFromInt((yyvsp[0].intNode));
+        (yyval.exprNodePtr) = addExpressionToList(expFromInt((yyvsp[0].val)));
 	}
-#line 1179 "alitarik-hw3.tab.c"
+#line 1198 "alitarik-hw3.tab.c"
     break;
 
-  case 20: /* expr: tREAL  */
-#line 61 "alitarik-hw3.y"
+  case 19: /* expr: tREAL  */
+#line 77 "alitarik-hw3.y"
                 {
-        (yyval.exprNodePtr) = expFromReal((yyvsp[0].realNode));
+        (yyval.exprNodePtr) = addExpressionToList(expFromReal((yyvsp[0].val)));
 	}
-#line 1187 "alitarik-hw3.tab.c"
+#line 1206 "alitarik-hw3.tab.c"
     break;
 
-  case 21: /* expr: tSTRING  */
-#line 64 "alitarik-hw3.y"
+  case 20: /* expr: tSTRING  */
+#line 80 "alitarik-hw3.y"
               {
-        (yyval.exprNodePtr) = expFromStr((yyvsp[0].strNode));
+        (yyval.exprNodePtr) = addExpressionToList(expFromStr((yyvsp[0].val)));
 	}
-#line 1195 "alitarik-hw3.tab.c"
+#line 1214 "alitarik-hw3.tab.c"
     break;
 
-  case 25: /* expr: '[' tADD ',' expr ',' expr ']'  */
-#line 70 "alitarik-hw3.y"
-                                     {
-        (yyval.exprNodePtr) = sumExp((yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr));
-    }
-#line 1203 "alitarik-hw3.tab.c"
+  case 21: /* expr: '[' tGET ',' tIDENT ']'  */
+#line 83 "alitarik-hw3.y"
+                              {(yyval.exprNodePtr) = defaultExp();}
+#line 1220 "alitarik-hw3.tab.c"
+    break;
+
+  case 22: /* expr: '[' tGET ',' tIDENT ',' expr_list ']'  */
+#line 84 "alitarik-hw3.y"
+                                            {(yyval.exprNodePtr) = defaultExp();}
+#line 1226 "alitarik-hw3.tab.c"
+    break;
+
+  case 23: /* expr: '[' tFUNCTION ',' param_list ',' stmt_list ']'  */
+#line 85 "alitarik-hw3.y"
+                                                     {(yyval.exprNodePtr) = defaultExp();}
+#line 1232 "alitarik-hw3.tab.c"
+    break;
+
+  case 24: /* expr: '[' tADD ',' expr ',' expr ']'  */
+#line 86 "alitarik-hw3.y"
+                                     {(yyval.exprNodePtr) = addExpressionToList(sumExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)));}
+#line 1238 "alitarik-hw3.tab.c"
+    break;
+
+  case 25: /* expr: '[' tSUB ',' expr ',' expr ']'  */
+#line 87 "alitarik-hw3.y"
+                                     {(yyval.exprNodePtr) = addExpressionToList(subExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)));}
+#line 1244 "alitarik-hw3.tab.c"
+    break;
+
+  case 26: /* expr: '[' tMUL ',' expr ',' expr ']'  */
+#line 88 "alitarik-hw3.y"
+                                     {(yyval.exprNodePtr) = addExpressionToList(multExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)));}
+#line 1250 "alitarik-hw3.tab.c"
+    break;
+
+  case 27: /* expr: '[' tDIV ',' expr ',' expr ']'  */
+#line 89 "alitarik-hw3.y"
+                                     {(yyval.exprNodePtr) = addExpressionToList(divExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)));}
+#line 1256 "alitarik-hw3.tab.c"
+    break;
+
+  case 28: /* expr: cond  */
+#line 90 "alitarik-hw3.y"
+           {(yyval.exprNodePtr) = defaultExp();}
+#line 1262 "alitarik-hw3.tab.c"
     break;
 
 
-#line 1207 "alitarik-hw3.tab.c"
+#line 1266 "alitarik-hw3.tab.c"
 
       default: break;
     }
@@ -1396,70 +1455,229 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 94 "alitarik-hw3.y"
+#line 108 "alitarik-hw3.y"
 
-
-ExprNode * expFromInt(IntNode n) {
+ExprNode * defaultExp() {
     ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
-    newNode->lineNum = n.lineNum;
+    newNode->valType = notConst;
+    return newNode;
+}
+ExprNode * expFromInt(Value v) {
+    ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
+    newNode->print = 0;
     newNode->valType = intType;
-    newNode->val.i = n.val;
+    newNode->val.i = v.i;
     return newNode;
 }
-ExprNode * expFromReal(RealNode n) {
+ExprNode * expFromReal(Value v) {
     ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
-    newNode->lineNum = n.lineNum;
+    newNode->print = 0;
     newNode->valType = realType;
-    newNode->val.r = n.val;
+    newNode->val.r = v.r;
     return newNode;
 }
-ExprNode * expFromStr(StrNode n) {
+ExprNode * expFromStr(Value v) {
     ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
-    newNode->lineNum = n.lineNum;
+    newNode->print = 0;
     newNode->valType = strType;
-    newNode->val.s = (char *)malloc(strlen(n.val));
-    strcpy(newNode->val.s, n.val);
+    newNode->val.s = (char *)malloc(strlen(v.s));
+    strcpy(newNode->val.s, v.s);
     return newNode;
 }
-ExprNode * sumExp(ExprNode * n1, ExprNode * n2) {
+ExprNode * sumExp(int linenum, ExprNode * n1, ExprNode * n2) {
     ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
-    newNode->lineNum = n1->lineNum;
-
+    
+    newNode->print = 1;
+    newNode->linenum = linenum;
+    if(!n1 || !n2 || n1->valType == notConst || n2->valType == notConst) return NULL; 
     if(n1->valType == intType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = intType;
         newNode->val.i = n1->val.i + n2->val.i;
     }
     else if(n1->valType == realType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = realType;
         newNode->val.r = n1->val.r + n2->val.i;
     }
     else if(n1->valType == intType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = realType;
         newNode->val.r = n1->val.i + n2->val.r;
     }
     else if(n1->valType == realType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = realType;
         newNode->val.r = n1->val.r + n2->val.r;
     }
     else if(n1->valType == strType && n2->valType == strType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = strType;
-        newNode->val.s = malloc(strlen(n1->val.s));
+        newNode->val.s = malloc(strlen(n1->val.s) + strlen(n2->val.s));
         strcpy(newNode->val.s, n1->val.s);
         strcat(newNode->val.s, n2->val.s);
-        printf("%s", newNode->val.s);
     }
     else {
-        printf("Type mismatsc\n");
+        newNode->valType = typeMismatch;
+        if(n1->valType == typeMismatch || n2->valType == typeMismatch) newNode->print = 0;
     }
     return newNode;
 }
 
+ExprNode * subExp(int linenum, ExprNode * n1, ExprNode * n2) {
+    ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
+    newNode->print = 1;
+    newNode->linenum = linenum;
+    if(!n1 || !n2 || n1->valType == notConst || n2->valType == notConst) return NULL; 
+    if(n1->valType == intType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = intType;
+        newNode->val.i = n1->val.i - n2->val.i;
+    }
+    else if(n1->valType == realType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r - n2->val.i;
+    }
+    else if(n1->valType == intType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.i - n2->val.r;
+    }
+    else if(n1->valType == realType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r - n2->val.r;
+    }
+    else {
+        newNode->valType = typeMismatch;
+        if(n1->valType == typeMismatch || n2->valType == typeMismatch) newNode->print = 0;
+    }
+    return newNode;
+}
+ExprNode * multExp(int linenum, ExprNode * n1, ExprNode * n2) {
+    ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
+    newNode->print = 1;
+    newNode->linenum = linenum;
+    if(!n1 || !n2 || n1->valType == notConst || n2->valType == notConst) return NULL; 
+    if(n1->valType == intType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = intType;
+        newNode->val.i = n1->val.i * n2->val.i;
+    }
+    else if(n1->valType == realType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r * n2->val.i;
+    }
+    else if(n1->valType == intType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.i * n2->val.r;
+    }
+    else if(n1->valType == realType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r * n2->val.r;
+    }
+    else if(n1->valType == intType && n2->valType == strType) {
+        if(n1->val.i < 0) {
+            newNode->valType = typeMismatch;
+            return newNode;
+        }
+
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = strType;
+
+        int count = n1->val.i;
+        if(count == 0) {
+            newNode->val.s = malloc(sizeof(char));
+            *newNode->val.s = '\0';
+        }
+        else {
+            char *res = malloc (strlen(n2->val.s) * count);
+            strcpy (res, n2->val.s);
+            while (--count > 0)
+                strcat (res, n2->val.s);
+            newNode->val.s = res;
+        }
+    }
+    else {
+        newNode->valType = typeMismatch;
+        if(n1->valType == typeMismatch || n2->valType == typeMismatch) newNode->print = 0;
+    }
+    return newNode;
+}
+ExprNode * divExp(int linenum, ExprNode * n1, ExprNode * n2) {
+    ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
+    newNode->print = 1;
+    newNode->linenum = linenum;
+    if(!n1 || !n2 || n1->valType == notConst || n2->valType == notConst) return NULL; 
+    if(n1->valType == intType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = intType;
+        newNode->val.i = n1->val.i / n2->val.i;
+    }
+    else if(n1->valType == realType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r / n2->val.i;
+    }
+    else if(n1->valType == intType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.i / n2->val.r;
+    }
+    else if(n1->valType == realType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r / n2->val.r;
+    }
+    else {
+        newNode->valType = typeMismatch;
+        if(n1->valType == typeMismatch || n2->valType == typeMismatch) newNode->print = 0;
+    }
+    return newNode;
+}
+
+
 int main () {
+    expressions = (ExprNode**)malloc(expressionsSize * sizeof(ExprNode*));
+
     if (yyparse()) {
         return 1;
     }
     else {
-        printf("OK\n");
+        int i = 0;
+        for(;i<exprIndex;i++){
+            if(!expressions[i] || !expressions[i]->print) continue;
+            if(expressions[i]->valType == intType)
+                printf("Result of expression on %d is (%d)\n", expressions[i]->linenum, expressions[i]->val.i);
+            if(expressions[i]->valType == realType)
+                printf("Result of expression on %d is (%0.1f)\n", expressions[i]->linenum, expressions[i]->val.r);
+            if(expressions[i]->valType == strType)
+                printf("Result of expression on %d is (%s)\n", expressions[i]->linenum, expressions[i]->val.s);
+            if(expressions[i]->valType == typeMismatch)
+                printf("Type mismatch on %d\n", expressions[i]->linenum);
+        }
         return 0;
     }
 }

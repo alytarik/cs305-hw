@@ -83,15 +83,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 17 "alitarik-hw3.y"
+#line 38 "alitarik-hw3.y"
 
-    IntNode intNode;
-    RealNode realNode;
-    StrNode strNode;
+    Value val;
     ExprNode* exprNodePtr;
-    int lineNum;
+    int linenum;
 
-#line 95 "alitarik-hw3.tab.h"
+#line 93 "alitarik-hw3.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

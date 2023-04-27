@@ -351,8 +351,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 26
-#define YY_END_OF_BUFFER 27
+#define YY_NUM_RULES 27
+#define YY_END_OF_BUFFER 28
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -362,8 +362,8 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[80] =
     {   0,
-        0,    0,   27,   25,   24,   24,   25,   25,   25,   20,
-       24,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        0,    0,   28,   26,   25,   24,   26,   26,   26,   20,
+       25,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,   19,   21,    0,   20,
         9,    7,    0,    8,    0,   10,   15,    0,    0,   12,
         0,   18,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -413,15 +413,15 @@ static const YY_CHAR yy_meta[31] =
 
 static const flex_int16_t yy_base[83] =
     {   0,
-        0,   10,  127,  128,    4,    7,   16,  121,  114,    8,
-       45,  120,   45,   12,  119,   46,  109,   47,  117,   23,
-       50,   51,   52,   53,   54,  115,  128,   52,  108,   53,
-      128,  128,  114,  128,  113,  128,  128,  112,  111,  128,
-      110,  128,  109,   61,   62,  108,   63,   64,   65,   91,
-       90,  128,  128,  128,  128,  128,   67,   93,  128,   66,
-       68,   92,   84,   70,  128,   74,   77,  128,   75,   86,
-       78,   79,  128,   82,   81,  128,   80,  128,  128,  107,
-      109,   23
+        0,   10,  123,  124,  120,  124,   16,  116,  109,    8,
+      117,  114,    2,   12,  113,   43,  103,   44,  111,   21,
+       45,    3,   46,   48,   49,  109,  124,   49,  102,   50,
+      124,  124,  108,  124,  107,  124,  124,  106,  105,  124,
+      104,  124,   98,   50,   51,   96,   58,   59,   60,   87,
+       81,  124,  124,  124,  124,  124,   62,   87,  124,   61,
+       63,   86,   75,   65,  124,   66,   69,  124,   71,   81,
+       73,   74,  124,   78,   77,  124,   75,  124,  124,  103,
+      105,    8
     } ;
 
 static const flex_int16_t yy_def[83] =
@@ -437,46 +437,46 @@ static const flex_int16_t yy_def[83] =
        79,   79
     } ;
 
-static const flex_int16_t yy_nxt[159] =
+static const flex_int16_t yy_nxt[155] =
     {   0,
-       79,    5,    6,    7,    8,   11,   11,    9,   11,   11,
+       79,    5,    6,    7,    8,   32,   42,    9,   33,   43,
        10,    5,    6,    7,    8,   34,   29,    9,   30,   35,
-       10,   12,   13,   14,   43,   15,   42,   16,   17,   18,
+       10,   12,   13,   14,   42,   15,   46,   16,   17,   18,
        19,   20,   21,   22,   23,   24,   25,   19,   19,   19,
-       19,   19,   19,   19,   19,   19,   11,   11,   32,   37,
-       40,   33,   44,   42,   42,   42,   42,   42,   38,   41,
-       50,   29,   28,   30,   42,   42,   42,   42,   42,   42,
-       42,   42,   45,   42,   46,   48,   49,   42,   42,   47,
-       42,   42,   42,   78,   42,   76,   57,   60,   64,   73,
-       58,   66,   61,   62,   63,   68,   65,   67,   69,   72,
+       19,   19,   19,   19,   19,   19,   37,   40,   42,   42,
+       44,   42,   42,   42,   42,   38,   41,   50,   29,   28,
+       30,   42,   42,   42,   42,   42,   42,   45,   42,   42,
+       48,   49,   42,   47,   42,   57,   42,   42,   78,   58,
+       42,   76,   60,   64,   73,   63,   66,   61,   62,   68,
+       65,   51,   67,   69,   70,   72,   71,   63,   74,   59,
 
-       51,   63,   70,   74,   71,   75,   77,    4,    4,   26,
-       26,   59,   42,   56,   55,   54,   53,   52,   51,   27,
-       42,   39,   36,   31,   28,   27,   79,    3,   79,   79,
+       75,   42,   77,    4,    4,   26,   26,   56,   55,   54,
+       53,   52,   51,   27,   42,   39,   36,   31,   11,   28,
+       27,   11,   79,    3,   79,   79,   79,   79,   79,   79,
        79,   79,   79,   79,   79,   79,   79,   79,   79,   79,
        79,   79,   79,   79,   79,   79,   79,   79,   79,   79,
-       79,   79,   79,   79,   79,   79,   79,   79
+       79,   79,   79,   79
     } ;
 
-static const flex_int16_t yy_chk[159] =
+static const flex_int16_t yy_chk[155] =
     {   0,
-        0,    1,    1,    1,    1,    5,    5,    1,    6,    6,
+        0,    1,    1,    1,    1,   13,   22,    1,   13,   82,
         1,    2,    2,    2,    2,   14,   10,    2,   10,   14,
-        2,    7,    7,    7,   82,    7,   20,    7,    7,    7,
+        2,    7,    7,    7,   20,    7,   22,    7,    7,    7,
         7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,   11,   11,   13,   16,
-       18,   13,   20,   21,   22,   23,   24,   25,   16,   18,
-       28,   30,   28,   30,   44,   45,   47,   48,   49,   60,
-       57,   61,   21,   64,   22,   24,   25,   66,   69,   23,
-       67,   71,   72,   77,   75,   74,   44,   47,   57,   70,
-       45,   60,   48,   49,   63,   62,   58,   61,   64,   69,
+        7,    7,    7,    7,    7,    7,   16,   18,   21,   23,
+       20,   24,   25,   44,   45,   16,   18,   28,   30,   28,
+       30,   47,   48,   49,   60,   57,   61,   21,   64,   66,
+       24,   25,   67,   23,   69,   44,   71,   72,   77,   45,
+       75,   74,   47,   57,   70,   63,   60,   48,   49,   62,
+       58,   51,   61,   64,   66,   69,   67,   50,   71,   46,
 
-       51,   50,   66,   71,   67,   72,   75,   80,   80,   81,
-       81,   46,   43,   41,   39,   38,   35,   33,   29,   26,
-       19,   17,   15,   12,    9,    8,    3,   79,   79,   79,
+       72,   43,   75,   80,   80,   81,   81,   41,   39,   38,
+       35,   33,   29,   26,   19,   17,   15,   12,   11,    9,
+        8,    5,    3,   79,   79,   79,   79,   79,   79,   79,
        79,   79,   79,   79,   79,   79,   79,   79,   79,   79,
        79,   79,   79,   79,   79,   79,   79,   79,   79,   79,
-       79,   79,   79,   79,   79,   79,   79,   79
+       79,   79,   79,   79
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -497,8 +497,18 @@ char *yytext;
 #line 2 "alitarik-hw3.flx"
 #include "hw3.h"
 #include "alitarik-hw3.tab.h"
-#line 501 "lex.yy.c"
-#line 502 "lex.yy.c"
+
+int line_counter = 1;
+int count_newline(char* str) {
+    int count = 0;
+    int i;
+    for (i = 0; str[i] != '\0'; i++)
+        if (str[i] == '\n')
+            count++;
+    return count;
+}
+#line 511 "lex.yy.c"
+#line 512 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -715,11 +725,11 @@ YY_DECL
 		}
 
 	{
-#line 5 "alitarik-hw3.flx"
+#line 15 "alitarik-hw3.flx"
 
 
 
-#line 723 "lex.yy.c"
+#line 733 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -752,7 +762,7 @@ yy_match:
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 128 );
+		while ( yy_base[yy_current_state] != 124 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -778,144 +788,150 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 8 "alitarik-hw3.flx"
+#line 18 "alitarik-hw3.flx"
 return tGET;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 9 "alitarik-hw3.flx"
+#line 19 "alitarik-hw3.flx"
 return tSET;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 10 "alitarik-hw3.flx"
+#line 20 "alitarik-hw3.flx"
 return tFUNCTION;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 11 "alitarik-hw3.flx"
+#line 21 "alitarik-hw3.flx"
 return tPRINT;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 12 "alitarik-hw3.flx"
+#line 22 "alitarik-hw3.flx"
 return tIF;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 13 "alitarik-hw3.flx"
+#line 23 "alitarik-hw3.flx"
 return tRETURN;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 15 "alitarik-hw3.flx"
-return tADD;
+#line 25 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tADD;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 16 "alitarik-hw3.flx"
-return tSUB;
+#line 26 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tSUB;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 17 "alitarik-hw3.flx"
-return tMUL;
+#line 27 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tMUL;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 18 "alitarik-hw3.flx"
-return tDIV;
+#line 28 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tDIV;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 19 "alitarik-hw3.flx"
-return tINC;
+#line 29 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tINC;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 20 "alitarik-hw3.flx"
-return tGT;
+#line 30 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tGT;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 21 "alitarik-hw3.flx"
-return tEQUALITY;
+#line 31 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tEQUALITY;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 22 "alitarik-hw3.flx"
-return tDEC;
+#line 32 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tDEC;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 23 "alitarik-hw3.flx"
-return tLT;
+#line 33 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tLT;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 24 "alitarik-hw3.flx"
-return tLEQ;
+#line 34 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tLEQ;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 25 "alitarik-hw3.flx"
-return tGEQ;
+#line 35 "alitarik-hw3.flx"
+{yylval.linenum = line_counter; return tGEQ;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 28 "alitarik-hw3.flx"
+#line 38 "alitarik-hw3.flx"
 return tIDENT;
 	YY_BREAK
 case 19:
 /* rule 19 can match eol */
 YY_RULE_SETUP
-#line 30 "alitarik-hw3.flx"
+#line 40 "alitarik-hw3.flx"
 {
     char *result = (char *)malloc(strlen(yytext));
     strcpy(result,yytext);
     result++;
     *(result+strlen(result)-1) = '\0';
-    yylval.strNode.val = result;
+    yylval.val.s = result;
+    line_counter+=count_newline(yytext);
     return tSTRING;
 };
 	YY_BREAK
 case 20:
-#line 41 "alitarik-hw3.flx"
+#line 52 "alitarik-hw3.flx"
 case 21:
 YY_RULE_SETUP
-#line 41 "alitarik-hw3.flx"
+#line 52 "alitarik-hw3.flx"
 {
-    yylval.intNode.val = atoi(yytext);
+    yylval.val.i = atoi(yytext);
     return tNUM;
 };
 	YY_BREAK
 case 22:
-#line 48 "alitarik-hw3.flx"
+#line 59 "alitarik-hw3.flx"
 case 23:
 YY_RULE_SETUP
-#line 48 "alitarik-hw3.flx"
+#line 59 "alitarik-hw3.flx"
 {
-    yylval.realNode.val = atof(yytext);
+    yylval.val.r = atof(yytext);
     return tREAL;
 };
 	YY_BREAK
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 53 "alitarik-hw3.flx"
-
+#line 63 "alitarik-hw3.flx"
+line_counter++;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 54 "alitarik-hw3.flx"
-return yytext[0];
+#line 64 "alitarik-hw3.flx"
+
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 56 "alitarik-hw3.flx"
+#line 65 "alitarik-hw3.flx"
+return yytext[0];
+	YY_BREAK
+case 27:
+YY_RULE_SETUP
+#line 67 "alitarik-hw3.flx"
 ECHO;
 	YY_BREAK
-#line 919 "lex.yy.c"
+#line 935 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1920,6 +1936,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 56 "alitarik-hw3.flx"
+#line 67 "alitarik-hw3.flx"
 
 

@@ -1,31 +1,48 @@
 %{
 #include "hw3.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 void yyerror (const char *s){
     s = "ERROR";
     printf ("%s\n", s);
 }
+int yylex();
 
-ExprNode * expFromInt(IntNode);
-ExprNode * expFromReal(RealNode);
-ExprNode * expFromStr(StrNode);
-ExprNode * sumExp(ExprNode*, ExprNode*);
+ExprNode * expFromInt(Value);
+ExprNode * expFromReal(Value);
+ExprNode * expFromStr(Value);
+ExprNode * defaultExp();
+ExprNode * sumExp(int, ExprNode*, ExprNode*);
+ExprNode * subExp(int, ExprNode*, ExprNode*);
+ExprNode * multExp(int, ExprNode*, ExprNode*);
+ExprNode * divExp(int, ExprNode*, ExprNode*);
+
+ExprNode ** expressions;
+int expressionsSize = 1024;
+int exprIndex = 0;
+
+ExprNode* addExpressionToList(ExprNode * newExpr){
+    if(exprIndex < expressionsSize)
+        expressions[exprIndex++] = newExpr;
+    else{
+        expressionsSize = expressionsSize + expressionsSize;
+        expressions = realloc(expressions, expressionsSize);
+        expressions[exprIndex++] = newExpr;
+    }
+}
+
 %}
 
 
 %union{
-    IntNode intNode;
-    RealNode realNode;
-    StrNode strNode;
+    Value val;
     ExprNode* exprNodePtr;
-    int lineNum;
+    int linenum;
 }
 
-%token tGET tSET tFUNCTION tPRINT tIF tRETURN tADD tSUB tMUL tDIV tINC tGT tEQUALITY tDEC tLT tLEQ tGEQ tIDENT
-%token <intNode> tNUM
-%token <realNode> tREAL
-%token <strNode> tSTRING
+%token <linenum> tGET tSET tFUNCTION tPRINT tIF tRETURN tADD tSUB tMUL tDIV tINC tGT tEQUALITY tDEC tLT tLEQ tGEQ tIDENT
+%token <val> tNUM tREAL tSTRING
 
 %type <exprNodePtr> expr
 
@@ -34,7 +51,6 @@ ExprNode * sumExp(ExprNode*, ExprNode*);
 stmt_list: '[' stmts ']';
 
 stmts:
-    | stmt
     | stmts stmt
 ;
 
@@ -56,24 +72,22 @@ cond: '[' tGEQ ',' expr ',' expr ']'
 ;
 
 expr: tNUM {
-        $$ = expFromInt($1);
+        $$ = addExpressionToList(expFromInt($1));
 	}
 	| tREAL {
-        $$ = expFromReal($1);
+        $$ = addExpressionToList(expFromReal($1));
 	}
     | tSTRING {
-        $$ = expFromStr($1);
+        $$ = addExpressionToList(expFromStr($1));
 	}
-    | '[' tGET ',' tIDENT ']'
-    | '[' tGET ',' tIDENT ',' expr_list ']'
-    | '[' tFUNCTION ',' param_list ',' stmt_list ']'
-    | '[' tADD ',' expr ',' expr ']' {
-        $$ = sumExp($4, $6);
-    }
-    | '[' tSUB ',' expr ',' expr ']'
-    | '[' tMUL ',' expr ',' expr ']'
-    | '[' tDIV ',' expr ',' expr ']'
-    | cond
+    | '[' tGET ',' tIDENT ']' {$$ = defaultExp();}
+    | '[' tGET ',' tIDENT ',' expr_list ']' {$$ = defaultExp();}
+    | '[' tFUNCTION ',' param_list ',' stmt_list ']' {$$ = defaultExp();}
+    | '[' tADD ',' expr ',' expr ']' {$$ = addExpressionToList(sumExp($2, $4, $6));}
+    | '[' tSUB ',' expr ',' expr ']' {$$ = addExpressionToList(subExp($2, $4, $6));}
+    | '[' tMUL ',' expr ',' expr ']' {$$ = addExpressionToList(multExp($2, $4, $6));}
+    | '[' tDIV ',' expr ',' expr ']' {$$ = addExpressionToList(divExp($2, $4, $6));}
+    | cond {$$ = defaultExp();}
 ;
 
 param_list: '[' params ']';
@@ -92,67 +106,227 @@ return: '[' tRETURN ']'
     | '[' tRETURN ',' expr']'
 ;
 %%
-
-ExprNode * expFromInt(IntNode n) {
+ExprNode * defaultExp() {
     ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
-    newNode->lineNum = n.lineNum;
+    newNode->valType = notConst;
+    return newNode;
+}
+ExprNode * expFromInt(Value v) {
+    ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
+    newNode->print = 0;
     newNode->valType = intType;
-    newNode->val.i = n.val;
+    newNode->val.i = v.i;
     return newNode;
 }
-ExprNode * expFromReal(RealNode n) {
+ExprNode * expFromReal(Value v) {
     ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
-    newNode->lineNum = n.lineNum;
+    newNode->print = 0;
     newNode->valType = realType;
-    newNode->val.r = n.val;
+    newNode->val.r = v.r;
     return newNode;
 }
-ExprNode * expFromStr(StrNode n) {
+ExprNode * expFromStr(Value v) {
     ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
-    newNode->lineNum = n.lineNum;
+    newNode->print = 0;
     newNode->valType = strType;
-    newNode->val.s = (char *)malloc(strlen(n.val));
-    strcpy(newNode->val.s, n.val);
+    newNode->val.s = (char *)malloc(strlen(v.s));
+    strcpy(newNode->val.s, v.s);
     return newNode;
 }
-ExprNode * sumExp(ExprNode * n1, ExprNode * n2) {
+ExprNode * sumExp(int linenum, ExprNode * n1, ExprNode * n2) {
     ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
-    newNode->lineNum = n1->lineNum;
-
+    
+    newNode->print = 1;
+    newNode->linenum = linenum;
+    if(!n1 || !n2 || n1->valType == notConst || n2->valType == notConst) return NULL; 
     if(n1->valType == intType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = intType;
         newNode->val.i = n1->val.i + n2->val.i;
     }
     else if(n1->valType == realType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = realType;
         newNode->val.r = n1->val.r + n2->val.i;
     }
     else if(n1->valType == intType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = realType;
         newNode->val.r = n1->val.i + n2->val.r;
     }
     else if(n1->valType == realType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = realType;
         newNode->val.r = n1->val.r + n2->val.r;
     }
     else if(n1->valType == strType && n2->valType == strType) {
+        n1->print = 0;
+        n2->print = 0;
         newNode->valType = strType;
-        newNode->val.s = malloc(strlen(n1->val.s));
+        newNode->val.s = malloc(strlen(n1->val.s) + strlen(n2->val.s));
         strcpy(newNode->val.s, n1->val.s);
         strcat(newNode->val.s, n2->val.s);
     }
     else {
-        printf("Type mismatch on X\n");
+        newNode->valType = typeMismatch;
+        if(n1->valType == typeMismatch || n2->valType == typeMismatch) newNode->print = 0;
     }
     return newNode;
 }
 
+ExprNode * subExp(int linenum, ExprNode * n1, ExprNode * n2) {
+    ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
+    newNode->print = 1;
+    newNode->linenum = linenum;
+    if(!n1 || !n2 || n1->valType == notConst || n2->valType == notConst) return NULL; 
+    if(n1->valType == intType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = intType;
+        newNode->val.i = n1->val.i - n2->val.i;
+    }
+    else if(n1->valType == realType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r - n2->val.i;
+    }
+    else if(n1->valType == intType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.i - n2->val.r;
+    }
+    else if(n1->valType == realType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r - n2->val.r;
+    }
+    else {
+        newNode->valType = typeMismatch;
+        if(n1->valType == typeMismatch || n2->valType == typeMismatch) newNode->print = 0;
+    }
+    return newNode;
+}
+ExprNode * multExp(int linenum, ExprNode * n1, ExprNode * n2) {
+    ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
+    newNode->print = 1;
+    newNode->linenum = linenum;
+    if(!n1 || !n2 || n1->valType == notConst || n2->valType == notConst) return NULL; 
+    if(n1->valType == intType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = intType;
+        newNode->val.i = n1->val.i * n2->val.i;
+    }
+    else if(n1->valType == realType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r * n2->val.i;
+    }
+    else if(n1->valType == intType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.i * n2->val.r;
+    }
+    else if(n1->valType == realType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r * n2->val.r;
+    }
+    else if(n1->valType == intType && n2->valType == strType) {
+        if(n1->val.i < 0) {
+            newNode->valType = typeMismatch;
+            return newNode;
+        }
+
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = strType;
+
+        int count = n1->val.i;
+        if(count == 0) {
+            newNode->val.s = malloc(sizeof(char));
+            *newNode->val.s = '\0';
+        }
+        else {
+            char *res = malloc (strlen(n2->val.s) * count);
+            strcpy (res, n2->val.s);
+            while (--count > 0)
+                strcat (res, n2->val.s);
+            newNode->val.s = res;
+        }
+    }
+    else {
+        newNode->valType = typeMismatch;
+        if(n1->valType == typeMismatch || n2->valType == typeMismatch) newNode->print = 0;
+    }
+    return newNode;
+}
+ExprNode * divExp(int linenum, ExprNode * n1, ExprNode * n2) {
+    ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
+    newNode->print = 1;
+    newNode->linenum = linenum;
+    if(!n1 || !n2 || n1->valType == notConst || n2->valType == notConst) return NULL; 
+    if(n1->valType == intType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = intType;
+        newNode->val.i = n1->val.i / n2->val.i;
+    }
+    else if(n1->valType == realType && n2->valType == intType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r / n2->val.i;
+    }
+    else if(n1->valType == intType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.i / n2->val.r;
+    }
+    else if(n1->valType == realType && n2->valType == realType) {
+        n1->print = 0;
+        n2->print = 0;
+        newNode->valType = realType;
+        newNode->val.r = n1->val.r / n2->val.r;
+    }
+    else {
+        newNode->valType = typeMismatch;
+        if(n1->valType == typeMismatch || n2->valType == typeMismatch) newNode->print = 0;
+    }
+    return newNode;
+}
+
+
 int main () {
+    expressions = (ExprNode**)malloc(expressionsSize * sizeof(ExprNode*));
+
     if (yyparse()) {
         return 1;
     }
     else {
-        printf("OK\n");
+        int i = 0;
+        for(;i<exprIndex;i++){
+            if(!expressions[i] || !expressions[i]->print) continue;
+            if(expressions[i]->valType == intType)
+                printf("Result of expression on %d is (%d)\n", expressions[i]->linenum, expressions[i]->val.i);
+            if(expressions[i]->valType == realType)
+                printf("Result of expression on %d is (%0.1f)\n", expressions[i]->linenum, expressions[i]->val.r);
+            if(expressions[i]->valType == strType)
+                printf("Result of expression on %d is (%s)\n", expressions[i]->linenum, expressions[i]->val.s);
+            if(expressions[i]->valType == typeMismatch)
+                printf("Type mismatch on %d\n", expressions[i]->linenum);
+        }
         return 0;
     }
 }
