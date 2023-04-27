@@ -32,6 +32,14 @@ ExprNode* addExpressionToList(ExprNode * newExpr){
     }
 }
 
+ExprNode* addExpressionToListBefore(ExprNode * newExpr, ExprNode * addBefore){
+    if(!addBefore)return addExpressionToList(newExpr);
+    int i = exprIndex++;
+    while(expressions[i--] != addBefore)
+        expressions[i] = expressions[i - 1];
+    expressions[i] = newExpr;
+}
+
 %}
 
 
@@ -80,14 +88,14 @@ expr: tNUM {
     | tSTRING {
         $$ = addExpressionToList(expFromStr($1));
 	}
-    | '[' tGET ',' tIDENT ']' {$$ = defaultExp();}
-    | '[' tGET ',' tIDENT ',' expr_list ']' {$$ = defaultExp();}
-    | '[' tFUNCTION ',' param_list ',' stmt_list ']' {$$ = defaultExp();}
-    | '[' tADD ',' expr ',' expr ']' {$$ = addExpressionToList(sumExp($2, $4, $6));}
-    | '[' tSUB ',' expr ',' expr ']' {$$ = addExpressionToList(subExp($2, $4, $6));}
-    | '[' tMUL ',' expr ',' expr ']' {$$ = addExpressionToList(multExp($2, $4, $6));}
-    | '[' tDIV ',' expr ',' expr ']' {$$ = addExpressionToList(divExp($2, $4, $6));}
-    | cond {$$ = defaultExp();}
+    | '[' tGET ',' tIDENT ']' {$$ = addExpressionToList(defaultExp());}
+    | '[' tGET ',' tIDENT ',' expr_list ']' {$$ = addExpressionToList(defaultExp());}
+    | '[' tFUNCTION ',' param_list ',' stmt_list ']' {$$ = addExpressionToList(defaultExp());}
+    | '[' tADD ',' expr ',' expr ']' {$$ = addExpressionToListBefore(sumExp($2, $4, $6), $4);}
+    | '[' tSUB ',' expr ',' expr ']' {$$ = addExpressionToListBefore(subExp($2, $4, $6), $4);}
+    | '[' tMUL ',' expr ',' expr ']' {$$ = addExpressionToListBefore(multExp($2, $4, $6), $4);}
+    | '[' tDIV ',' expr ',' expr ']' {$$ = addExpressionToListBefore(divExp($2, $4, $6), $4);}
+    | cond {$$ = addExpressionToList(defaultExp());}
 ;
 
 param_list: '[' params ']';

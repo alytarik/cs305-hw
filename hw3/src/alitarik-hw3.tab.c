@@ -102,8 +102,16 @@ ExprNode* addExpressionToList(ExprNode * newExpr){
     }
 }
 
+ExprNode* addExpressionToListBefore(ExprNode * newExpr, ExprNode * addBefore){
+    if(!addBefore)return addExpressionToList(newExpr);
+    int i = exprIndex++;
+    while(expressions[i--] != addBefore)
+        expressions[i] = expressions[i - 1];
+    expressions[i] = newExpr;
+}
 
-#line 107 "alitarik-hw3.tab.c"
+
+#line 115 "alitarik-hw3.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -556,10 +564,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    51,    51,    53,    54,    57,    58,    59,    60,    61,
-      62,    63,    64,    67,    68,    69,    70,    71,    74,    77,
-      80,    83,    84,    85,    86,    87,    88,    89,    90,    93,
-      94,    95,    96,    99,   100,   101,   102,   105,   106
+       0,    59,    59,    61,    62,    65,    66,    67,    68,    69,
+      70,    71,    72,    75,    76,    77,    78,    79,    82,    85,
+      88,    91,    92,    93,    94,    95,    96,    97,    98,   101,
+     102,   103,   104,   107,   108,   109,   110,   113,   114
 };
 #endif
 
@@ -1190,79 +1198,79 @@ yyreduce:
   switch (yyn)
     {
   case 18: /* expr: tNUM  */
-#line 74 "alitarik-hw3.y"
+#line 82 "alitarik-hw3.y"
            {
         (yyval.exprNodePtr) = addExpressionToList(expFromInt((yyvsp[0].val)));
-	}
-#line 1198 "alitarik-hw3.tab.c"
-    break;
-
-  case 19: /* expr: tREAL  */
-#line 77 "alitarik-hw3.y"
-                {
-        (yyval.exprNodePtr) = addExpressionToList(expFromReal((yyvsp[0].val)));
 	}
 #line 1206 "alitarik-hw3.tab.c"
     break;
 
-  case 20: /* expr: tSTRING  */
-#line 80 "alitarik-hw3.y"
-              {
-        (yyval.exprNodePtr) = addExpressionToList(expFromStr((yyvsp[0].val)));
+  case 19: /* expr: tREAL  */
+#line 85 "alitarik-hw3.y"
+                {
+        (yyval.exprNodePtr) = addExpressionToList(expFromReal((yyvsp[0].val)));
 	}
 #line 1214 "alitarik-hw3.tab.c"
     break;
 
+  case 20: /* expr: tSTRING  */
+#line 88 "alitarik-hw3.y"
+              {
+        (yyval.exprNodePtr) = addExpressionToList(expFromStr((yyvsp[0].val)));
+	}
+#line 1222 "alitarik-hw3.tab.c"
+    break;
+
   case 21: /* expr: '[' tGET ',' tIDENT ']'  */
-#line 83 "alitarik-hw3.y"
-                              {(yyval.exprNodePtr) = defaultExp();}
-#line 1220 "alitarik-hw3.tab.c"
+#line 91 "alitarik-hw3.y"
+                              {(yyval.exprNodePtr) = addExpressionToList(defaultExp());}
+#line 1228 "alitarik-hw3.tab.c"
     break;
 
   case 22: /* expr: '[' tGET ',' tIDENT ',' expr_list ']'  */
-#line 84 "alitarik-hw3.y"
-                                            {(yyval.exprNodePtr) = defaultExp();}
-#line 1226 "alitarik-hw3.tab.c"
+#line 92 "alitarik-hw3.y"
+                                            {(yyval.exprNodePtr) = addExpressionToList(defaultExp());}
+#line 1234 "alitarik-hw3.tab.c"
     break;
 
   case 23: /* expr: '[' tFUNCTION ',' param_list ',' stmt_list ']'  */
-#line 85 "alitarik-hw3.y"
-                                                     {(yyval.exprNodePtr) = defaultExp();}
-#line 1232 "alitarik-hw3.tab.c"
+#line 93 "alitarik-hw3.y"
+                                                     {(yyval.exprNodePtr) = addExpressionToList(defaultExp());}
+#line 1240 "alitarik-hw3.tab.c"
     break;
 
   case 24: /* expr: '[' tADD ',' expr ',' expr ']'  */
-#line 86 "alitarik-hw3.y"
-                                     {(yyval.exprNodePtr) = addExpressionToList(sumExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)));}
-#line 1238 "alitarik-hw3.tab.c"
+#line 94 "alitarik-hw3.y"
+                                     {(yyval.exprNodePtr) = addExpressionToListBefore(sumExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)), (yyvsp[-3].exprNodePtr));}
+#line 1246 "alitarik-hw3.tab.c"
     break;
 
   case 25: /* expr: '[' tSUB ',' expr ',' expr ']'  */
-#line 87 "alitarik-hw3.y"
-                                     {(yyval.exprNodePtr) = addExpressionToList(subExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)));}
-#line 1244 "alitarik-hw3.tab.c"
+#line 95 "alitarik-hw3.y"
+                                     {(yyval.exprNodePtr) = addExpressionToListBefore(subExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)), (yyvsp[-3].exprNodePtr));}
+#line 1252 "alitarik-hw3.tab.c"
     break;
 
   case 26: /* expr: '[' tMUL ',' expr ',' expr ']'  */
-#line 88 "alitarik-hw3.y"
-                                     {(yyval.exprNodePtr) = addExpressionToList(multExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)));}
-#line 1250 "alitarik-hw3.tab.c"
+#line 96 "alitarik-hw3.y"
+                                     {(yyval.exprNodePtr) = addExpressionToListBefore(multExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)), (yyvsp[-3].exprNodePtr));}
+#line 1258 "alitarik-hw3.tab.c"
     break;
 
   case 27: /* expr: '[' tDIV ',' expr ',' expr ']'  */
-#line 89 "alitarik-hw3.y"
-                                     {(yyval.exprNodePtr) = addExpressionToList(divExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)));}
-#line 1256 "alitarik-hw3.tab.c"
+#line 97 "alitarik-hw3.y"
+                                     {(yyval.exprNodePtr) = addExpressionToListBefore(divExp((yyvsp[-5].linenum), (yyvsp[-3].exprNodePtr), (yyvsp[-1].exprNodePtr)), (yyvsp[-3].exprNodePtr));}
+#line 1264 "alitarik-hw3.tab.c"
     break;
 
   case 28: /* expr: cond  */
-#line 90 "alitarik-hw3.y"
-           {(yyval.exprNodePtr) = defaultExp();}
-#line 1262 "alitarik-hw3.tab.c"
+#line 98 "alitarik-hw3.y"
+           {(yyval.exprNodePtr) = addExpressionToList(defaultExp());}
+#line 1270 "alitarik-hw3.tab.c"
     break;
 
 
-#line 1266 "alitarik-hw3.tab.c"
+#line 1274 "alitarik-hw3.tab.c"
 
       default: break;
     }
@@ -1455,7 +1463,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 108 "alitarik-hw3.y"
+#line 116 "alitarik-hw3.y"
 
 ExprNode * defaultExp() {
     ExprNode * newNode = (ExprNode *)malloc(sizeof(ExprNode));
