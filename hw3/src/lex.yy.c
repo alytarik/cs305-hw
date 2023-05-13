@@ -495,7 +495,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "alitarik-hw3.flx"
 #line 2 "alitarik-hw3.flx"
-#include "hw3.h"
+#include "alitarik-hw3.h"
 #include "alitarik-hw3.tab.h"
 
 int line_counter = 1;

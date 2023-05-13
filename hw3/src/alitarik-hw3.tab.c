@@ -69,7 +69,7 @@
 /* First part of user prologue.  */
 #line 1 "alitarik-hw3.y"
 
-#include "hw3.h"
+#include "alitarik-hw3.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
