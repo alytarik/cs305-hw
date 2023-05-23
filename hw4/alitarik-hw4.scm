@@ -1,23 +1,10 @@
-(define main-procedure
-    (lambda (tripleList)
-        (if (or (null? tripleList) (not (list? tripleList)))
-            (error "ERROR305: the input should be a list full of triples")
-            (if (check-triple? tripleList)
-                (sort-area (filter-pythagorean (filter-triangle (sort-all-triples tripleList))))
-                (error "ERROR305: the input should be a list full of triples")
-            )
-        )
-    )
-)
-
 (define (applyand func lst)
-    (cond
-        ((null? lst) #t)
-        ((and 
+    (if (null? lst)
+        #t
+        (and 
             (func (car lst))
             (applyand func (cdr lst))
-        ) #t)
-        (else #f)
+        )
     )
 )
 
@@ -32,14 +19,17 @@
 
 (define check-length?
     (lambda (inTriple count)
-        (= (length inTriple) count)
+        (if (null? inTriple)
+            (= count 0)
+            (check-length? (cdr inTriple) (- count 1))
+        )
     )
 )
 
 (define check-sides?
     (lambda (inTriple)
         (and
-            (applyand number? inTriple) ;check values are numbers
+            (applyand integer? inTriple) ;check values are numbers
             (applyand (lambda (x) (> x 0)) inTriple) ;check values are positive
         )
     )
@@ -53,46 +43,78 @@
 
 (define sort-triple
     (lambda (inTriple)
-        (sort inTriple <) 
+        (insertion-sort inTriple <) 
     )
 )
 
 (define filter-triangle
     (lambda (tripleList)
-        (filter triangle? tripleList)
+        (if (null? tripleList)
+            tripleList
+            (if (triangle? (car tripleList))
+                (cons (car tripleList) (filter-triangle (cdr tripleList)))
+                (filter-triangle (cdr tripleList))
+            )
+        )
     )
 )
 
 (define triangle?
     (lambda (triple)
     (> 
-        (+ (car triple) (cadr triple))
-        (caddr triple)
+        (+ (car triple) (cadr triple)) ; a+b
+        (caddr triple) ; c
     )
     )
 )
 
 (define filter-pythagorean
     (lambda (tripleList)
-        (filter pythagorean-triangle? tripleList)
+        (if (null? tripleList)
+            tripleList
+            (if (pythagorean-triangle? (car tripleList))
+                (cons (car tripleList) (filter-pythagorean (cdr tripleList)))
+                (filter-pythagorean (cdr tripleList))
+            )
+        )
     )
 )
 
 (define pythagorean-triangle?
     (lambda (triple)
         (= 
-            (* (caddr triple) (caddr triple)) ; c^2
             (+
                 (* (car triple) (car triple)) ; a^2
                 (* (cadr triple) (cadr triple)); b^2
             )
+            (* (caddr triple) (caddr triple)) ; c^2
         )
     )
 )
 
+(define (insertion-sort mlist func)
+    (define (insert mlist element)
+        (cond
+            ((null? mlist) (list element))
+            ((func element (car mlist)) (cons element mlist))
+            (else (cons (car mlist) (insert (cdr mlist) element)))
+        )
+    )
+    
+    (define (insertion-sort-helper sorted mlist)
+        (if (null? mlist)
+            sorted
+            (insertion-sort-helper (insert sorted (car mlist)) (cdr mlist))
+        )
+    )
+    
+    ; start from empty list and insert min
+    (insertion-sort-helper '() mlist)
+)
+
 (define sort-area
     (lambda (tripleList)
-        (sort tripleList (lambda (x y) (< (get-area x) (get-area y))))
+        (insertion-sort tripleList (lambda (x y) (< (get-area x) (get-area y))))
     )
 )
 
@@ -102,5 +124,16 @@
     )
 )
 
+(define main-procedure
+    (lambda (tripleList)
+        (if (or (null? tripleList) (not (list? tripleList)))
+            (error "ERROR305: the input should be a list full of triples")
+            (if (check-triple? tripleList)
+                (sort-area (filter-pythagorean (filter-triangle (sort-all-triples tripleList))))
+                (error "ERROR305: the input should be a list full of triples")
+            )
+        )
+    )
+)
 
-(main-procedure '((6 10 8) (5 4 3) (1 2 3)))
+(main-procedure '((1.5 2.5 3)))

@@ -1,19 +1,22 @@
-
-(define sort-area
-    (lambda (tripleList)
-        (sort tripleList (lambda (x y) (< (get-area x) (get-area y))))
+(define (insertion-sort lst func)
+    (define (insert lst element)
+        (cond
+            ((null? lst) (list element))
+            ((func element (car lst)) (cons element lst))
+            (else (cons (car lst) (insert (cdr lst) element)))
+        )
     )
+    
+    (define (insertion-sort-helper sorted lst)
+        (cond 
+            ((null? lst) sorted)
+            (else (insertion-sort-helper (insert sorted (car lst)) (cdr lst)))
+        )
+    )
+    
+    (insertion-sort-helper '() lst)
 )
 
-(define get-area
-    (lambda (triple)
-        (/ (* (car triple) (cadr triple)) 2) ; a*b/2
-    )
-)
-
-(sort-area '(
-    (3 4 5)
-    (8 40 41)
-    (7 24 25)
-    (6 8 10)
-))
+;; Example usage:
+(insertion-sort '(5 2 8 1 9) <)  ; Returns: (1 2 5 8 9)
+(insertion-sort '((1 2) (3 9) (5 1)) (lambda (x y) (< (cadr x) (cadr y))))  ; Returns: (1 2 5 8 9)
