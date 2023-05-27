@@ -11,7 +11,7 @@
 ; check conditions are valid and ends with 'else' statement
 (define conditional-list? (lambda (conditions)
 	(cond 
-        ((and (> (length conditions) 1) (equal? (length (car conditions)) 2)) (conditional-list? (cdr conditions)))
+        ((and (> (length conditions) 1) (list? (car conditions)) (equal? (length (car conditions)) 2) (not (equal? (caar conditions) 'else))) (conditional-list? (cdr conditions)))
         ((and (equal? (length conditions) 1) (equal? (caar conditions) 'else)) #t)
         (else #f)
     )
@@ -65,7 +65,7 @@
 ; get the value of var from env
 (define get-value (lambda (var env)
     (cond
-        ((null? env) (error "s7: unbound variable -->" var))
+        ((null? env) #f)
         ((equal? (caar env) var) (cdar env))
         (else (get-value var (cdr env)))
     )
@@ -150,7 +150,12 @@
             (s7 expr env))
         )
         (dummy2 (display "cs305: "))
-        (dummy3 (display val))
+        (dummy3
+            (if (equal? val #f)
+                (display "ERROR")
+                (display val)
+            )
+        )
         (dummy4 (newline))
         (dummy4 (newline)))
         (repl new-env)
@@ -167,6 +172,7 @@
         ((op-stmt? e) (interpret-op e env))
         ((let-stmt? e) (interpret-let (cadr e) (caddr e) env))
         ((let-star-stmt? e) (interpret-let-star (cadr e) (caddr e) env))
+        (else #f)
     )
 ))
 
