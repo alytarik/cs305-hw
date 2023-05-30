@@ -1,11 +1,11 @@
 ; check the statement is if statement
 (define if-stmt? (lambda (e)
-	(and (list? e) (equal? (car e) 'if)  (= (length e) 4))
+	(and (list? e) (= (length e) 4) (equal? (car e) 'if))
 ))
 
 ; check the statement is cond statement
 (define cond-stmt? (lambda (e)
-	(and (list? e) (equal? (car e) 'cond) (>= (length e) 3) (conditional-list? (cdr e)))
+	(and (list? e) (>= (length e) 3) (equal? (car e) 'cond) (conditional-list? (cdr e)))
 ))
 
 ; check conditions are valid and ends with 'else' statement
@@ -19,14 +19,14 @@
 
 ; check the statement is operation statement
 (define op-stmt? (lambda (e)
-	(or
+    (or
         (equal? (car e) '+)
         (equal? (car e) '-)
         (equal? (car e) '*)
         (equal? (car e) '/)
     )
 ))
-  
+
 ; check the statement is define statement
 (define define-stmt? (lambda (e)
 	(and (list? e) (equal? (car e) 'define) (symbol? (cadr e)) (= (length e) 3))
@@ -73,10 +73,12 @@
 
 
 
-(define interpret-if (lambda (e env) 
-    (if (equal? (s7 (car e) env) 0) ; check value==0
-        (s7 (caddr e) env) ; if it is 0, interpret 3rd expr
-        (s7 (cadr e) env) ; else, interpret 4th expr
+(define interpret-if (lambda (e env)
+    (if (equal? (s7 (car e) env) #f) #f
+        (if (equal? (s7 (car e) env) 0) ; check value==0
+            (s7 (caddr e) env) ; if it is 0, interpret 3rd expr
+            (s7 (cadr e) env) ; else, interpret 4th expr
+        )
     )
 ))
 
@@ -84,6 +86,7 @@
   (lambda (clauses env)
     (cond
         ((equal? (caar clauses) 'else) (s7 (cadar clauses) env))
+        ((equal? (s7 (caar clauses) env) #f) #f)
         ((not (equal? (s7 (caar clauses) env) 0)) (s7 (cadar clauses) env))
         (else (interpret-cond (cdr clauses) env))
     )
@@ -91,6 +94,7 @@
 
 (define interpret-op (lambda (e env)
     (cond 
+        ((equal? (interpret-args (cdr e) env) #f) #f)
         ((equal? (car e) '+) (apply + (interpret-args (cdr e) env)))
         ((equal? (car e) '-) (apply - (interpret-args (cdr e) env)))
         ((equal? (car e) '*) (apply * (interpret-args (cdr e) env)))
@@ -99,12 +103,14 @@
 ))
 
 (define interpret-args (lambda (exprs env)
-    (if (null? exprs)
-        '()
-        (cons
+    (cond 
+        ((null? exprs) '())
+        ((equal? (s7 (car exprs) env) #f) #f)
+        ((equal? (interpret-args (cdr exprs) env) #f) #f)
+        (else (cons
             (s7 (car exprs) env)
             (interpret-args (cdr exprs) env)
-        )
+        ))
     )
 ))
 
@@ -140,13 +146,13 @@
         (dummy1 (display "cs305> "))
         (expr (read))
         (new-env
-            (if (define-stmt? expr)
+            (if (and (define-stmt? expr) (not (equal? (s7 (caddr expr) env) #f)))
                 (extend-env (cadr expr) (s7 (caddr expr) env) env)
                 env
             )
         )
         (val (if (define-stmt? expr)
-            (cadr expr)
+            (if (not (equal? (s7 (caddr expr) env) #f)) (cadr expr) #f)
             (s7 expr env))
         )
         (dummy2 (display "cs305: "))
