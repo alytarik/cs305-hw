@@ -117,27 +117,41 @@
 (define interpret-let-args (lambda (args env)
     (if (null? args)
         args
-        (cons (cons (caar args) (s7 (cadar args) env)) (interpret-let-args (cdr args) env))
+        (let
+            (
+                (curr (s7 (cadar args) env))
+                (others (interpret-let-args (cdr args) env))
+            )
+            (if (or (equal? curr #f) (equal? others #f)) #f
+                (cons (cons (caar args) (s7 (cadar args) env)) (interpret-let-args (cdr args) env))
+            )
+        )
     )
 ))
 
 (define interpret-let-star-args (lambda (args env)
     (if (null? args)
         env
+        (if (equal? (s7 (cadar args) env) #f) #f 
         (interpret-let-star-args (cdr args) (cons (cons (caar args) (s7 (cadar args) env)) env))
+        )
     )
 ))
 
 
 (define interpret-let (lambda (vars body env)
-    (let 
-        ((new-env (append (interpret-let-args vars env) env)))
-        (s7 body new-env)
+    (if (equal? (interpret-let-args vars env) #f) #f
+        (let 
+            ((new-env (append (interpret-let-args vars env) env)))
+            (s7 body new-env)
+        )
     )
 ))
 
 (define interpret-let-star (lambda (vars body env)
-    (s7 body (interpret-let-star-args vars env))
+    (if (equal? (interpret-let-star-args vars env) #f) #f
+        (s7 body (interpret-let-star-args vars env))
+    )
 ))
 
 ; get input and display values
